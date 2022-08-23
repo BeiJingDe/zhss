@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ylxx.cloud.upms.rel.mapper.RelUserOrgMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="relUserOrgVo">
+        <id column="user_id" property="userId" />
+        <result column="org_id" property="orgId" />
+    </resultMap>
+    
+	<!-- 通用查询映射结果扩展 -->
+    <resultMap id="BaseResultMapExt" extends="BaseResultMap" type="relUserOrgVo">
+    	<!-- 说明：关联其他表查询，多出来的字段映射写在此处，另外RelUserOrgVO也要加上对应的属性 -->
+    	
+    </resultMap>
+    
+
+	<select id="selectPageVo" resultMap="BaseResultMapExt" parameterType="relUserOrgDto">
+		select
+			T1.user_id,
+			T1.org_id
+		from
+			t_base_rel_user_org T1
+		<where>
+			<if test="param.userId != null and param.userId != ''">AND T1.user_id = #{param.userId}</if>
+			<if test="param.orgId != null and param.orgId != ''">AND T1.org_id = #{param.orgId}</if>
+		</where>
+	</select>
+
+	<insert id="insertBatch" parameterType="list">
+		insert into t_base_rel_user_org
+		(
+			user_id,
+			org_id
+		) 
+		values 
+		<foreach collection="list" item="item" index="index" separator=",">
+            (
+				#{item.userId},
+				#{item.orgId}
+			)
+        </foreach>
+	</insert>
+
+</mapper>

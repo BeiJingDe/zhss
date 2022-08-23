@@ -1,0 +1,31 @@
+#injectionConfig:
+#  requestPath: /zhss/subIndex
+#  hasExcelExportImport: true
+#
+#dataSourceConfig:
+#  driverName: com.mysql.cj.jdbc.Driver
+#  url: jdbc:mysql://127.0.0.1:3306/dm_zhss?serverTimezone=GMT%2b8&useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowMultiQueries=true
+#  username: root
+#  password: 
+#
+#globalConfig:
+#  outputDir: D:/java_workspace/zhss/ylxx-business/com.ylxx.cloud.zhss/src/main/java
+#  author: chenrongcheng
+#
+#strategyConfig:
+#  tablePrefix: zhss_
+#  include: zhss_sub_index
+#
+#packageConfig:
+#  parent: com.ylxx.cloud.zhss
+
+
+
+
+
+
+
+
+
+
+

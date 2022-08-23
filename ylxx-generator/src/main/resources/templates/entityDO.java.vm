@@ -1,0 +1,131 @@
+package ${package.Entity};
+
+import com.baomidou.mybatisplus.annotation.TableId;
+#foreach($pkg in ${table.importPackages})
+import ${pkg};
+#end
+import com.ylxx.cloud.core.annotation.Excel;
+import com.ylxx.cloud.core.annotation.Excels;
+#if(${swagger2})
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+#end
+#if(${entityLombokModel})
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+#end
+
+/**
+ * $!{table.comment}
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${entityLombokModel})
+@Data
+  #if(${superEntityClass})
+@EqualsAndHashCode(callSuper = true)
+  #else
+@EqualsAndHashCode(callSuper = false)
+  #end
+#end
+#if(${table.convert})
+#end
+#if(${swagger2})
+@ApiModel(value="${entity}对象", description="$!{table.comment}")
+#end
+#if(${superEntityClass})
+public class ${entity} extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
+#elseif(${activeRecord})
+public class ${entity} extends Model<${entity}> {
+#else
+@TableName("${table.name}")
+public class ${entity} implements Serializable {
+#end
+	
+	// 说明：此model字段属性与数据库字段一一对应，不允许在此处添加数据库表没有的字段
+	
+#if(${entitySerialVersionUID})
+    private static final long serialVersionUID = 1L;
+#end
+## ----------  BEGIN 字段循环遍历  ----------
+#set($index = 0)
+#foreach($field in ${table.fields})
+  #set($index = $index + 1)
+
+  #if(${field.keyFlag})
+    @TableId
+  #end
+  #if("$!field.comment" != "")
+    #if(${swagger2})
+    @ApiModelProperty(value = "${field.comment}")
+    #else
+    // ${field.comment}
+    #end
+  #end
+  #if(${cfg.hasExcelExportImport})
+    @Excel(name = "${field.comment}", sort = ${index})
+  #end
+    private ${field.propertyType} ${field.propertyName};
+#end
+## ----------  END 字段循环遍历  ----------
+
+#if(!${entityLombokModel})
+#foreach($field in ${table.fields})
+  #if(${field.propertyType.equals("boolean")})
+    #set($getprefix="is")
+  #else
+    #set($getprefix="get")
+  #end
+
+    public ${field.propertyType} ${getprefix}${field.capitalName}() {
+        return ${field.propertyName};
+    }
+
+  #if(${entityBuilderModel})
+    public ${entity} set${field.capitalName}(${field.propertyType} ${field.propertyName}) {
+  #else
+    public void set${field.capitalName}(${field.propertyType} ${field.propertyName}) {
+  #end
+        this.${field.propertyName} = ${field.propertyName};
+  #if(${entityBuilderModel})
+        return this;
+  #end
+    }
+#end
+## --foreach end---
+#end
+## --end of #if(!${entityLombokModel})--
+
+#if(${entityColumnConstant})
+  #foreach($field in ${table.fields})
+    public static final String ${field.name.toUpperCase()} = "${field.name}";
+
+  #end
+#end
+#if(${activeRecord})
+    @Override
+    protected Serializable pkVal() {
+  #if(${keyPropertyName})
+        return this.${keyPropertyName};
+  #else
+        return null;
+  #end
+    }
+
+#end
+#if(!${entityLombokModel})
+    @Override
+    public String toString() {
+        return "${entity}{" +
+  #foreach($field in ${table.fields})
+    #if($!{foreach.index}==0)
+        "${field.propertyName}=" + ${field.propertyName} +
+    #else
+        ", ${field.propertyName}=" + ${field.propertyName} +
+    #end
+  #end
+        "}";
+    }
+#end
+}

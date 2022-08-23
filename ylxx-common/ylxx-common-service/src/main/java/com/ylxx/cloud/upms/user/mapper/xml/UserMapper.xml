@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ylxx.cloud.upms.user.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="userVo">
+        <id column="id" property="id" />
+        <result column="username" property="username" />
+        <result column="realname" property="realname" />
+        <result column="mmpd" property="mmpd" />
+        <result column="gender" property="gender" />
+        <result column="birthday" property="birthday" />
+        <result column="phone" property="phone" />
+        <result column="email" property="email" />
+        <result column="avater_url" property="avaterUrl" />
+        <result column="status" property="status" />
+		<result column="province" property="province" />
+		<result column="city" property="city" />
+		<result column="county" property="county" />
+        <result column="last_login_time" property="lastLoginTime" />
+        <result column="last_logout_time" property="lastLogoutTime" />
+		<result column="remarks" property="remarks" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+	<!-- 通用查询映射结果扩展 -->
+    <resultMap id="BaseResultMapExt" extends="BaseResultMap" type="userVo">
+    	<!-- 说明：关联其他表查询，多出来的字段映射写在此处，另外UserVO也要加上对应的属性 -->
+		<result column="role_sort_no" property="roleSortNo" />
+    </resultMap>
+
+
+	<select id="selectPageVo" resultMap="BaseResultMapExt" parameterType="userDto">
+		select
+			T1.id,
+			T1.username,
+			T1.realname,
+			T1.mmpd,
+			T1.gender,
+			T1.birthday,
+			T1.phone,
+			T1.email,
+			T1.avater_url,
+			T1.status,
+			T1.province,
+			T1.city,
+			T1.county,
+			T1.last_login_time,
+			T1.last_logout_time,
+			T1.remarks,
+			T1.create_by,
+			T1.create_time,
+			T1.update_by,
+			T1.update_time,
+			t2.role_sort_no
+		from
+			t_base_user T1
+			left join (select tt1.user_id, MIN(tt2.sort_no) role_sort_no from t_base_rel_user_role tt1 left join t_base_role tt2 on tt1.role_id = tt2.id group by tt1.user_id) t2
+				on T1.id = t2.user_id
+			where status != 3
+			<if test="param.id != null and param.id != ''">AND T1.id = #{param.id}</if>
+			<if test="param.username != null and param.username != ''">AND T1.username = #{param.username}</if>
+			<if test="param.usernameQuery != null and param.usernameQuery != ''">AND T1.username like concat('%',#{param.usernameQuery},'%')</if>
+			<if test="param.realname != null and param.realname != ''">AND T1.realname like concat('%',#{param.realname},'%')</if>
+			<if test="param.mmpd != null and param.mmpd != ''">AND T1.mmpd = #{param.mmpd}</if>
+			<if test="param.gender != null and param.gender != ''">AND T1.gender = #{param.gender}</if>
+			<if test="param.birthday != null and param.birthday != ''">AND T1.birthday = #{param.birthday}</if>
+			<if test="param.phone != null and param.phone != ''">AND T1.phone = #{param.phone}</if>
+			<if test="param.email != null and param.email != ''">AND T1.email = #{param.email}</if>
+			<if test="param.avaterUrl != null and param.avaterUrl != ''">AND T1.avater_url = #{param.avaterUrl}</if>
+			<if test="param.status != null and param.status != ''">AND T1.status = #{param.status}</if>
+			<if test="param.province != null and param.province != ''">AND T1.province = #{param.province}</if>
+			<if test="param.city != null and param.city != ''">AND T1.city = #{param.city}</if>
+			<if test="param.county != null and param.county != ''">AND T1.county = #{param.county}</if>
+			<if test="param.lastLoginTime != null and param.lastLoginTime != ''">AND T1.last_login_time = #{param.lastLoginTime}</if>
+			<if test="param.lastLogoutTime != null and param.lastLogoutTime != ''">AND T1.last_logout_time = #{param.lastLogoutTime}</if>
+			<if test="param.remarks != null and param.remarks != ''">AND T1.remarks = #{param.remarks}</if>
+			<if test="param.createBy != null and param.createBy != ''">AND T1.create_by = #{param.createBy}</if>
+			<if test="param.createTime != null and param.createTime != ''">AND T1.create_time = #{param.createTime}</if>
+			<if test="param.updateBy != null and param.updateBy != ''">AND T1.update_by = #{param.updateBy}</if>
+			<if test="param.updateTime != null and param.updateTime != ''">AND T1.update_time = #{param.updateTime}</if>
+			<if test="param.ids != null and param.ids.size() > 0">
+				AND T1.id in
+				<foreach collection="param.ids" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		<if test="param.roleCode != null and param.roleCode != ''">AND T1.id  IN (SELECT user_id FROM t_base_rel_user_role a ,t_base_role b WHERE a.role_id = b.id AND b.role_code = #{param.roleCode} )</if>
+		<if test="param.orgId != null and param.orgId != ''">AND T1.id  IN ( SELECT user_id FROM t_base_rel_user_org where org_id  = #{param.orgId} ) </if>
+	</select>
+
+	<select id="selectPageVoList" resultType="java.lang.String" parameterType="userDto">
+		SELECT
+			username
+		FROM
+			`t_base_user`
+		WHERE
+			LENGTH( username ) = 6
+		ORDER BY
+			create_time DESC
+	</select>
+
+
+    <insert id="insertBatch" parameterType="list">
+		insert into t_base_user
+		(
+			id,
+			username,
+			realname,
+			mmpd,
+			gender,
+			birthday,
+			phone,
+			email,
+			avater_url,
+			status,
+			province,
+			city,
+			county,
+			last_login_time,
+			last_logout_time,
+			remarks,
+			create_by,
+			create_time,
+			update_by,
+			update_time
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+            (
+				#{item.id},
+				#{item.username},
+				#{item.realname},
+				#{item.mmpd},
+				#{item.gender},
+				#{item.birthday},
+				#{item.phone},
+				#{item.email},
+				#{item.avaterUrl},
+				#{item.status},
+				#{item.province},
+				#{item.city},
+				#{item.county},
+				#{item.lastLoginTime},
+				#{item.lastLogoutTime},
+				#{item.remarks},
+				#{item.createBy},
+				#{item.createTime},
+				#{item.updateBy},
+				#{item.updateTime}
+			)
+        </foreach>
+	</insert>
+
+	<select id="selectUserAndRealname" resultType="hashMap">
+		select
+			username,
+			realname
+		from
+			t_base_user
+	</select>
+
+	<select id="selectRoleCodeByUserName" resultType="java.lang.String">
+		SELECT role_code
+		FROM
+		  t_base_user a,
+		  t_base_rel_user_role b,
+		  t_base_role c
+		WHERE a.id = b.user_id
+		AND b.role_id = c.id
+		AND a.username = #{username}
+	</select>
+
+	<select id="selectBaseOrg" resultType="com.ylxx.cloud.upms.user.model.BaseOrg">
+		SELECT * FROM  t_base_org where id = #{deptId}
+	</select>
+
+	<select id="selectBaseOrgCorp" resultType="com.ylxx.cloud.upms.user.model.BaseOrg">
+		SELECT * FROM  t_base_org  where org_type = 'CORP'
+	</select>
+
+	<delete id="deleteBaseOrgDept">
+		delete from t_base_org where org_type = 'DEPT'
+	</delete>
+
+	<insert id="insertBaseOrg" parameterType="com.ylxx.cloud.upms.user.model.BaseOrg">
+        INSERT INTO `t_base_org`
+               (id, org_name, org_type, parent_id, org_code, data_id, remarks, location, fax, phone,status)
+        VALUES (#{id},#{orgName},#{orgType},#{parentId},#{orgCode},#{dataId},#{remarks},#{location},#{fax},#{phone},1)
+    </insert>
+
+	<insert id="insertBaseUserOrg" >
+        INSERT INTO `t_base_rel_user_org`
+            (user_id, org_id)
+        VALUES (#{userId}, #{deptId})
+    </insert>
+
+	<select id="selectOrgVos" resultType="com.ylxx.cloud.upms.org.model.OrgVO">
+		select
+			T1.id,
+			T1.parent_id,
+			T1.org_name,
+			T1.org_code,
+			T1.org_type,
+			T1.phone,
+			T1.fax,
+			T1.location,
+			T1.remarks,
+			T1.status,
+			T1.province,
+			T1.city,
+			T1.county,
+			T1.sort_no,
+			T1.create_by,
+			T1.create_time,
+			T1.update_by,
+			T1.update_time
+		from
+			t_base_org T1
+		<where>
+			<if test="username != null and username != ''">
+				and T1.id IN (SELECT org_id FROM t_base_rel_user_org WHERE user_id in ( select id from t_base_user where username = #{username} ) )
+			</if>
+		</where>
+	</select>
+
+	<select id="selectOrgVo" resultType="com.ylxx.cloud.upms.org.model.OrgVO">
+		select
+		T1.id,
+		T1.parent_id,
+		T1.org_name,
+		T1.org_code,
+		T1.org_type,
+		T1.phone,
+		T1.fax,
+		T1.location,
+		T1.remarks,
+		T1.status,
+		T1.province,
+		T1.city,
+		T1.county,
+		T1.sort_no,
+		T1.create_by,
+		T1.create_time,
+		T1.update_by,
+		T1.update_time
+		from
+		t_base_org T1
+		<where>
+			<if test="parentId != null and parentId != ''">
+				and T1.id = #{parentId}
+			</if>
+		</where>
+	</select>
+
+</mapper>

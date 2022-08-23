@@ -1,0 +1,134 @@
+## start
+#set($end = $entity.length() - 3)
+#set($superEntityClass = $entity.substring(0, $end) + 'DO')
+## end
+package ${package.Entity};
+
+#foreach($pkg in ${table.importPackages})
+import ${pkg};
+#end
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+#if(${swagger2})
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+#end
+#if(${entityLombokModel})
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+#end
+import com.ylxx.cloud.core.annotation.ValidateModel;
+
+/**
+ * $!{table.comment}
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${entityLombokModel})
+@Data
+  #if(${superEntityClass})
+@EqualsAndHashCode(callSuper = true)
+  #else
+@EqualsAndHashCode(callSuper = false)
+  #end
+#end
+#if(${table.convert})
+#end
+#if(${swagger2})
+@ApiModel(value="${entity}对象", description="$!{table.comment}")
+#end
+@ValidateModel
+#if(${superEntityClass})
+public class ${entity} extends ${superEntityClass}#if(${activeRecord})<${entity}>#end {
+#elseif(${activeRecord})
+public class ${entity} extends Model<${entity}> {
+#else
+public class ${entity} implements Serializable {
+#end
+
+	// 说明：此model继承了${superEntityClass}，controller查询使用此model接收参数，如果父类没有对应的条件属性，可在此处添加
+
+#if(${entitySerialVersionUID})
+    private static final long serialVersionUID = 1L;
+#end
+    
+    @ApiModelProperty(value = "查询的页码，默认第1页")
+    private long current = 1;
+
+    @ApiModelProperty(value = "查询每页条数，默认10条")
+    private long size = 10;
+        
+    @ApiModelProperty(value = "排序字段（JSON数组字符串），有先后顺序，例：[{column:'create_time',asc:true},{column:'update_time',asc:false}]，说明：按照字段create_time升序，update_time降序排列")
+    private String orders;
+
+    @ApiModelProperty("模糊查询字段")
+    private String searchName;
+
+    @ApiModelProperty("起始查询时间")
+    private Date beginTime;
+
+    @ApiModelProperty("截止查询时间")
+    private Date endTime;
+    
+#if(!${entityLombokModel})
+#foreach($field in ${table.fields})
+  #if(${field.propertyType.equals("boolean")})
+    #set($getprefix="is")
+  #else
+    #set($getprefix="get")
+  #end
+
+    public ${field.propertyType} ${getprefix}${field.capitalName}() {
+        return ${field.propertyName};
+    }
+
+  #if(${entityBuilderModel})
+    public ${entity} set${field.capitalName}(${field.propertyType} ${field.propertyName}) {
+  #else
+    public void set${field.capitalName}(${field.propertyType} ${field.propertyName}) {
+  #end
+        this.${field.propertyName} = ${field.propertyName};
+  #if(${entityBuilderModel})
+        return this;
+  #end
+    }
+#end
+## --foreach end---
+#end
+## --end of #if(!${entityLombokModel})--
+
+#if(${entityColumnConstant})
+  #foreach($field in ${table.fields})
+    public static final String ${field.name.toUpperCase()} = "${field.name}";
+
+  #end
+#end
+#if(${activeRecord})
+    @Override
+    protected Serializable pkVal() {
+  #if(${keyPropertyName})
+        return this.${keyPropertyName};
+  #else
+        return null;
+  #end
+    }
+
+#end
+#if(!${entityLombokModel})
+    @Override
+    public String toString() {
+        return "${entity}{" +
+  #foreach($field in ${table.fields})
+    #if($!{foreach.index}==0)
+        "${field.propertyName}=" + ${field.propertyName} +
+    #else
+        ", ${field.propertyName}=" + ${field.propertyName} +
+    #end
+  #end
+        "}";
+    }
+#end
+}

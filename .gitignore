@@ -1,0 +1,16 @@
+# Project exclude paths
+/ylxx-business/com.ylxx.cloud.zhss-visual-platform/target/
+/ylxx-business/ylxx-business-base/target/
+/ylxx-business/ylxx-file/target/
+/ylxx-business/ylxx-system/target/
+/ylxx-business/ylxx-upms/target/
+/ylxx-common/ylxx-common-base/target/
+/ylxx-common/ylxx-common-consts/target/
+/ylxx-common/ylxx-common-core/target/
+/ylxx-common/ylxx-common-exception/target/
+/ylxx-common/ylxx-common-filter/target/
+/ylxx-common/ylxx-common-service/target/
+/ylxx-common/ylxx-common-shiro/target/
+/ylxx-common/ylxx-common-util/target/
+/ylxx-family/ylxx-gateway/target/
+/ylxx-generator/target/

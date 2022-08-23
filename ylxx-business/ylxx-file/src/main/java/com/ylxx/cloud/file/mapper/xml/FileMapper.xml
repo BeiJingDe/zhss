@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ylxx.cloud.file.mapper.FileMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap" type="fileVo">
+		<id column="id" property="id" />
+		<result column="belong_id" property="belongId" />
+		<result column="file_name" property="fileName" />
+		<result column="file_path" property="filePath" />
+		<result column="status" property="status" />
+		<result column="extra_prop" property="extraProp" />
+		<result column="remarks" property="remarks" />
+		<result column="download_count" property="downloadCount" />
+		<result column="create_by" property="createBy" />
+		<result column="create_time" property="createTime" />
+		<result column="update_by" property="updateBy" />
+		<result column="update_time" property="updateTime" />
+		<result column="file_type" property="fileType" />
+	</resultMap>
+
+	<!-- 通用查询映射结果扩展 -->
+	<resultMap id="BaseResultMapExt" extends="BaseResultMap" type="fileVo">
+		<!-- 说明：关联其他表查询，多出来的字段映射写在此处，另外FileVO也要加上对应的属性 -->
+
+	</resultMap>
+
+	<select id="selectPageVo" resultMap="BaseResultMapExt" parameterType="fileDto">
+		select
+			T1.id,
+			T1.belong_id,
+			T1.file_name,
+			T1.file_path,
+			T1.status,
+			T1.extra_prop,
+			T1.remarks,
+			T1.download_count,
+			T1.create_by,
+			T1.create_time,
+			T1.update_by,
+			T1.update_time,
+			T1.file_type
+		from
+			t_base_file T1
+		<where>
+			<if test="param.id != null and param.id != ''">AND T1.id = #{param.id}</if>
+			<if test="param.belongId != null and param.belongId != ''">AND T1.belong_id = #{param.belongId}</if>
+			<if test="param.fileName != null and param.fileName != ''">AND T1.file_name like concat('%', #{param.fileName}, '%')</if>
+			<if test="param.filePath != null and param.filePath != ''">AND T1.file_path = #{param.filePath}</if>
+			<if test="param.status != null and param.status != ''">AND T1.status = #{param.status}</if>
+			<if test="param.extraProp != null and param.extraProp != ''">AND T1.extra_prop = #{param.extraProp}</if>
+			<if test="param.remarks != null and param.remarks != ''">AND T1.remarks = #{param.remarks}</if>
+			<if test="param.downloadCount != null">AND T1.download_count = #{param.downloadCount}</if>
+			<if test="param.createBy != null and param.createBy != ''">AND T1.create_by = #{param.createBy}</if>
+			<if test="param.createTime != null and param.createTime != ''">AND T1.create_time = #{param.createTime}</if>
+			<if test="param.updateBy != null and param.updateBy != ''">AND T1.update_by = #{param.updateBy}</if>
+			<if test="param.updateTime != null and param.updateTime != ''">AND T1.update_time = #{param.updateTime}</if>
+			<if test="param.ids != null and param.ids.size() > 0">
+				AND T1.id in
+				<foreach collection="param.ids" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="param.fileType != null and param.fileType != ''">AND T1.file_type = #{param.fileType}</if>
+		</where>
+	</select>
+
+	<insert id="insertBatch" parameterType="list">
+		insert into t_base_file
+		(
+			id,
+			belong_id,
+			file_name,
+			file_path,
+			status,
+			extra_prop,
+			remarks,
+			download_count,
+			create_by,
+			create_time,
+			update_by,
+			update_time,
+			file_type
+		)
+		values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+				#{item.id},
+				#{item.belongId},
+				#{item.fileName},
+				#{item.filePath},
+				#{item.status},
+				#{item.extraProp},
+				#{item.remarks},
+				#{item.downloadCount},
+				#{item.createBy},
+				#{item.createTime},
+				#{item.updateBy},
+				#{item.updateTime},
+				#{item.fileType}
+			)
+		</foreach>
+	</insert>
+
+	<update id="updateDownloadCount" parameterType="string">
+		UPDATE t_base_file SET download_count = IFNULL(download_count, 0) + 1 WHERE id = #{id}
+	</update>
+
+</mapper>

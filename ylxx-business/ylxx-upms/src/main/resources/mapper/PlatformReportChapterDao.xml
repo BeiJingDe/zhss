@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace=".dao.PlatformReportChapterDao">
+
+    <resultMap type=".entity.PlatformReportChapter" id="PlatformReportChapterMap">
+        <result property="chapterId" column="chapter_id" jdbcType="INTEGER"/>
+        <result property="chapterName" column="chapter_name" jdbcType="VARCHAR"/>
+        <result property="reportId" column="report_id" jdbcType="INTEGER"/>
+        <result property="order" column="order" jdbcType="INTEGER"/>
+        <result property="isEnable" column="is_enable" jdbcType="BOOLEAN"/>
+        <result property="userId" column="user_id" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="PlatformReportChapterMap">
+        select
+          chapter_id, chapter_name, report_id, order, is_enable, user_id, create_time, update_time
+        from spiderw_mgt.platform_report_chapter
+        where chapter_id = #{chapterId}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="PlatformReportChapterMap">
+        select
+          chapter_id, chapter_name, report_id, order, is_enable, user_id, create_time, update_time
+        from spiderw_mgt.platform_report_chapter
+        limit #{offset}, #{limit}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="PlatformReportChapterMap">
+        select
+        chapter_id, chapter_name, report_id, order, is_enable, user_id, create_time, update_time
+        from spiderw_mgt.platform_report_chapter
+        <where>
+            <if test="chapterId != null">
+                and chapter_id = #{chapterId}
+            </if>
+            <if test="chapterName != null and chapterName != ''">
+                and chapter_name = #{chapterName}
+            </if>
+            <if test="reportId != null">
+                and report_id = #{reportId}
+            </if>
+            <if test="order != null">
+                and order = #{order}
+            </if>
+            <if test="isEnable != null">
+                and is_enable = #{isEnable}
+            </if>
+            <if test="userId != null and userId != ''">
+                and user_id = #{userId}
+            </if>
+            <if test="createTime != null">
+                and create_time = #{createTime}
+            </if>
+            <if test="updateTime != null">
+                and update_time = #{updateTime}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="chapterId" useGeneratedKeys="true">
+        insert into spiderw_mgt.platform_report_chapter(chapter_name, report_id, order, is_enable, user_id, create_time, update_time)
+        values (#{chapterName}, #{reportId}, #{order}, #{isEnable}, #{userId}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update spiderw_mgt.platform_report_chapter
+        <set>
+            <if test="chapterName != null and chapterName != ''">
+                chapter_name = #{chapterName},
+            </if>
+            <if test="reportId != null">
+                report_id = #{reportId},
+            </if>
+            <if test="order != null">
+                order = #{order},
+            </if>
+            <if test="isEnable != null">
+                is_enable = #{isEnable},
+            </if>
+            <if test="userId != null and userId != ''">
+                user_id = #{userId},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime},
+            </if>
+        </set>
+        where chapter_id = #{chapterId}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from spiderw_mgt.platform_report_chapter where chapter_id = #{chapterId}
+    </delete>
+
+</mapper>

@@ -1,0 +1,127 @@
+#set($end = $entity.length() - 2)
+#set($entity2 = $entity.substring(0, $end))
+#set($entityLowFirst2 = $entity2.substring(0,1).toLowerCase() + $entity2.substring(1))
+package ${package.ServiceImpl};
+
+import java.util.List;
+
+import cn.hutool.core.date.DateUtil;
+import com.ylxx.cloud.core.poi.ExcelUtil;
+import com.ylxx.cloud.core.service.impl.CommonCoreServiceImpl;
+import com.ylxx.cloud.core.util.HttpServletUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import ${package.Entity}.${entity2}DO;
+import ${package.Entity}.${entity2}DTO;
+import ${package.Entity}.${entity2}VO;
+import com.ylxx.cloud.exception.ext.ServiceException;
+import ${package.Mapper}.${table.mapperName};
+import ${package.Service}.${table.serviceName};
+
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+
+import ${superServiceImplClassPackage};
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
+
+/**
+ * @Description $!{table.comment} 服务实现类
+ * @author ${author}
+ * @since ${date}
+ */
+@Service
+@Transactional
+#if(${kotlin})
+open class ${table.serviceImplName} : ${superServiceImplClass}<${table.mapperName}, ${entity2}DO>(), ${table.serviceName} {
+
+}
+#else
+public class ${table.serviceImplName} implements ${table.serviceName} {
+	
+	@Resource
+	private ${table.mapperName} ${entityLowFirst2}Mapper;
+	
+	@Override
+	public Page<${entity2}VO> selectPageVo(${entity2}DTO ${entityLowFirst2}Dto) {
+		Page<${entity2}DTO> page = new Page<${entity2}DTO>(${entityLowFirst2}Dto.getCurrent(), ${entityLowFirst2}Dto.getSize());
+		if(StrUtil.isNotBlank(${entityLowFirst2}Dto.getOrders())) {
+			page.addOrder(CommonCoreServiceImpl.parseOrders(${entityLowFirst2}Dto.getOrders()));
+		}
+		return ${entityLowFirst2}Mapper.selectPageVo(page, ${entityLowFirst2}Dto);
+	}
+
+	@Override
+	public ${entity2}VO selectById(String id) {
+		if(StrUtil.isNotBlank(id)) {
+			${entity2}DTO ${entityLowFirst2}Dto = new ${entity2}DTO();
+			${entityLowFirst2}Dto.setId(id);
+			List<${entity2}VO> vos = ${entityLowFirst2}Mapper.selectPageVo(${entityLowFirst2}Dto);
+			if(ObjectUtil.isNotEmpty(vos) && vos.size() == 1) {
+				return vos.get(0);
+			}
+		}
+		return null;
+	}
+	
+	@Override
+	public void insert(${entity2}VO ${entityLowFirst2}Vo) {
+		${entityLowFirst2}Vo.setId(IdUtil.fastSimpleUUID());
+		${entityLowFirst2}Vo.setCreateTime(DateUtil.date());
+		${entityLowFirst2}Vo.setUpdateTime(DateUtil.date());
+		${entityLowFirst2}Vo.setCreateBy(HttpServletUtil.getUsername());
+		${entityLowFirst2}Vo.setUpdateBy(HttpServletUtil.getUsername());
+
+		${entityLowFirst2}Mapper.insert(${entityLowFirst2}Vo);
+	}
+	
+	@Override
+	public void insertBatch(List<${entity2}VO> ${entityLowFirst2}Vos) {
+		if(ObjectUtil.isNotEmpty(${entityLowFirst2}Vos)) {
+			${entityLowFirst2}Mapper.insertBatch(${entityLowFirst2}Vos);
+		}
+	}
+
+	@Override
+	public void update(${entity2}VO ${entityLowFirst2}Vo) {
+		${entityLowFirst2}Vo.setUpdateTime(DateUtil.date());
+		${entityLowFirst2}Vo.setUpdateBy(HttpServletUtil.getUsername());
+
+		${entityLowFirst2}Mapper.updateById(${entityLowFirst2}Vo);
+	}
+	
+	@Override
+	public void deleteBatchIds(List<String> ids) {
+		if(ObjectUtil.isNotEmpty(ids)) {
+			${entityLowFirst2}Mapper.deleteBatchIds(ids);
+		}
+	}
+
+	@Override
+	public void importData(MultipartFile file) {
+		try {
+			if (ObjectUtil.isNull(file)) {
+				throw new ServiceException("上传文件不能为空");
+			}
+			if (file.getOriginalFilename().lastIndexOf(".xls") == -1
+					&& file.getOriginalFilename().lastIndexOf(".xlsx") == -1) {
+				throw new ServiceException("请上传excel格式文件（.xls/.xlsx）");
+			}
+			List<${entity2}VO> importList = ExcelUtil.importExcel(${entity2}VO.class, file.getInputStream());
+			this.insertBatch(importList);
+		} catch (Exception e) {
+			throw new ServiceException("数据导入失败", e);
+		}
+	}
+	
+}
+#end

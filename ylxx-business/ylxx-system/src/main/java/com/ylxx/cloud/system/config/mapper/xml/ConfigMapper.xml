@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ylxx.cloud.system.config.mapper.ConfigMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="configVo">
+        <id column="id" property="id" />
+        <result column="config_group" property="configGroup" />
+        <result column="key" property="key" />
+        <result column="value" property="value" />
+        <result column="description" property="description" />
+        <result column="is_encrypt" property="isEncrypt" />
+        <result column="sort_no" property="sortNo" />
+        <result column="is_show" property="isShow" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_by" property="createBy" />
+		<result column="update_by" property="updateBy" />
+    </resultMap>
+    
+	<!-- 通用查询映射结果扩展 -->
+    <resultMap id="BaseResultMapExt" extends="BaseResultMap" type="configVo">
+    	
+    </resultMap>
+
+	<select id="selectPageVo" resultMap="BaseResultMapExt" parameterType="configDto">
+		select
+			T1.id,
+			T1.config_group,
+			T1.key,
+			T1.value,
+			T1.description,
+			T1.is_encrypt,
+			T1.sort_no,
+			T1.is_show,
+			T1.create_by,
+			T1.create_time,
+			T1.update_by,
+			T1.update_time
+		from
+			t_system_config T1
+		<where>
+			<if test="param.id != null and param.id != ''">AND T1.id = #{param.id}</if>
+			<if test="param.configGroup != null and param.configGroup != ''">AND T1.config_group = #{param.configGroup}</if>
+			<if test="param.key != null and param.key != ''">AND T1.key = #{param.key}</if>
+			<if test="param.configGroupQuery != null and param.configGroupQuery != ''">AND T1.config_group like concat('%', #{param.configGroupQuery}, '%')</if>
+			<if test="param.keyQuery != null and param.keyQuery != ''">AND T1.key like concat('%', #{param.keyQuery}, '%')</if>
+			<if test="param.value != null and param.value != ''">T1.value like concat('%',#{param.value},'%')</if>
+			<if test="param.description != null and param.description != ''">AND T1.description = #{param.description}</if>
+			<if test="param.isEncrypt != null and param.isEncrypt != ''">AND T1.is_encrypt = #{param.isEncrypt}</if>
+			<if test="param.sortNo != null and param.sortNo != ''">AND T1.sort_no = #{param.sortNo}</if>
+			<if test="param.isShow != null and param.isShow != ''">AND T1.is_show = #{param.isShow}</if>
+			<if test="param.createBy != null and param.createBy != ''">AND T1.create_by = #{param.createBy}</if>
+			<if test="param.createTime != null">AND T1.create_time = #{param.createTime}</if>
+			<if test="param.updateBy != null and param.updateBy != ''">AND T1.update_by = #{param.updateBy}</if>
+			<if test="param.updateTime != null">AND T1.update_time = #{param.updateTime}</if>
+			<if test="param.searchName != null and param.searchName != ''">
+				AND (
+					T1.group_name like concat('%',#{param.searchName},'%')
+					or
+					T1.name like concat('%',#{param.searchName},'%')
+					or
+					T1.value like concat('%',#{param.searchName},'%')
+				)
+			</if>
+		</where>
+	</select>
+
+	<insert id="insertBatch" parameterType="list">
+		insert into t_system_config
+		( 
+			id,
+			config_group,
+			key,
+			value,
+			description,
+			is_encrypt,
+			sort_no,
+			is_show,
+			create_by,
+			create_time,
+			update_by,
+			update_time
+		) 
+		values 
+		<foreach collection="list" item="item" index="index" separator=",">
+            (
+				#{item.id},
+				#{item.configGroup},
+				#{item.key},
+				#{item.value},
+				#{item.description},
+				#{item.isEncrypt},
+				#{item.sortNo},
+				#{item.isShow},
+				#{item.createBy},
+				#{item.createTime},
+				#{item.updateBy},
+				#{item.updateTime}
+			)
+        </foreach>
+	</insert>
+
+</mapper>

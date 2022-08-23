@@ -1,0 +1,34 @@
+#set($end = $entity.length() - 2)
+#set($entity2 = $entity.substring(0, $end))
+#set($entityLowFirst2 = $entity2.substring(0,1).toLowerCase() + $entity2.substring(1))
+package ${package.Mapper};
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import ${superMapperClassPackage};
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import ${package.Entity}.${entity2}DO;
+import ${package.Entity}.${entity2}DTO;
+import ${package.Entity}.${entity2}VO;
+
+/**
+ * $!{table.comment} Mapper 接口
+ *
+ * @author ${author}
+ * @since ${date}
+ */
+#if(${kotlin})
+interface ${table.mapperName} : ${superMapperClass}<${entity2}DO>
+#else
+public interface ${table.mapperName} extends ${superMapperClass}<${entity2}DO> {
+	
+	Page<${entity2}VO> selectPageVo(Page<${entity2}DTO> page, @Param("param") ${entity2}DTO ${entityLowFirst2}Dto);
+
+	List<${entity2}VO> selectPageVo(@Param("param") ${entity2}DTO ${entityLowFirst2}Dto);
+
+	void insertBatch(List<? extends ${entity2}DO> ${entityLowFirst2}Dos);
+
+}
+#end

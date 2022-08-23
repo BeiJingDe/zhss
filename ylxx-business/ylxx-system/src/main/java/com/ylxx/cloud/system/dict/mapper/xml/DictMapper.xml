@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ylxx.cloud.system.dict.mapper.DictMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="dictVo">
+        <id column="id" property="id" />
+        <result column="parent_id" property="parentId" />
+        <result column="code" property="code" />
+        <result column="name" property="name" />
+		<result column="remarks" property="remarks" />
+        <result column="dict_type" property="dictType" />
+        <result column="sort_no" property="sortNo" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="create_by" property="createBy" />
+		<result column="update_by" property="updateBy" />
+    </resultMap>
+
+	<!-- 通用查询映射结果扩展 -->
+	<resultMap id="BaseResultMapExt" extends="BaseResultMap" type="dictVo">
+		<result column="child_num" property="childNum" />
+
+    </resultMap>
+    
+
+	<select id="selectPageVo" resultMap="BaseResultMapExt" parameterType="dictDto">
+		select
+			T1.id,
+			T1.parent_id,
+			T1.code,
+			T1.name,
+			T1.remarks,
+			T1.dict_type,
+			T1.sort_no,
+			T1.create_by,
+			T1.create_time,
+			T1.update_by,
+			T1.update_time,
+			IFNULL(T2.child_num, 0) child_num
+		from
+			t_system_dict T1
+			left join ( select parent_id, COUNT(1) child_num from t_system_dict where parent_id is not null group by parent_id ) T2
+				on T1.id = T2.parent_id
+		<where>
+			<if test="param.id != null and param.id != ''">AND T1.id = #{param.id}</if>
+			<if test="param.parentId != null and param.parentId != ''">AND T1.parent_id = #{param.parentId}</if>
+			<if test="param.code != null and param.code != ''">AND T1.code = #{param.code}</if>
+			<if test="param.codeQuery != null and param.codeQuery != ''">AND T1.code like concat('%', #{param.codeQuery}, '%')</if>
+			<if test="param.name != null and param.name != ''">AND T1.name like concat ('%', #{param.name}, '%')</if>
+			<if test="param.remarks != null and param.remarks != ''">AND T1.remarks = #{param.remarks}</if>
+			<if test="param.dictType != null and param.dictType != ''">AND T1.dict_type = #{param.dictType}</if>
+			<if test="param.sortNo != null and param.sortNo != ''">AND T1.sort_no = #{param.sortNo}</if>
+			<if test="param.createBy != null and param.createBy != ''">AND T1.create_by = #{param.createBy}</if>
+			<if test="param.createTime != null and param.createTime != ''">AND T1.create_time = #{param.createTime}</if>
+			<if test="param.updateBy != null and param.updateBy != ''">AND T1.update_by = #{param.updateBy}</if>
+			<if test="param.updateTime != null and param.updateTime != ''">AND T1.update_time = #{param.updateTime}</if>
+			<if test="param.ids != null and param.ids.size() > 0">
+				AND T1.id in
+				<foreach collection="param.ids" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+	<insert id="insertBatch" parameterType="list">
+		insert into t_system_dict
+		( 
+			id,
+			parent_id,
+			code,
+			name,
+			remarks,
+			dict_type,
+			sort_no,
+			create_by,
+			create_time,
+			update_by,
+			update_time
+		) 
+		values 
+		<foreach collection="list" item="item" index="index" separator=",">
+            (
+				#{item.id},
+				#{item.parentId},
+				#{item.code},
+				#{item.name},
+				#{item.remarks},
+				#{item.dictType},
+				#{item.sortNo},
+				#{item.createBy},
+				#{item.createTime},
+				#{item.updateBy},
+				#{item.updateTime}
+			)
+        </foreach>
+	</insert>
+
+</mapper>

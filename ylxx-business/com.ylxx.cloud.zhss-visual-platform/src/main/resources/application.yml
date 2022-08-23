@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: zhss
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/ #指定服务注册中心的位置
+    fetch-registry: true #启用服务消费者就从注册中心拉取服务列表的功能
+    registry-fetch-interval-seconds: 30 #设置服务消费者从注册中心拉取服务列表的间隔

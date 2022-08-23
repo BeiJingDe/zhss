@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ylxx.cloud.upms.login.mapper.LoginMapper">
+
+    <select id="selectBoardModule" resultType="java.lang.String">
+        select  DISTINCT(code)  from  t_base_rel_role_home_page_del
+        <where>
+            <if test="userName != null and userName != ''">AND (user_name = #{userName})</if>
+            AND is_enable=1
+        </where>
+    </select>
+
+</mapper>

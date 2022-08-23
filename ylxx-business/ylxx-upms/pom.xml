@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>ylxx-business</artifactId>
+        <groupId>com.ylxx.cloud</groupId>
+        <version>${revision}</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>ylxx-upms</artifactId>
+
+    <dependencies>
+        <!-- my -->
+        <dependency>
+            <groupId>com.ylxx.cloud</groupId>
+            <artifactId>ylxx-business-base</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <!-- isc -->
+        <dependency>
+            <groupId>com.sgcc.uap</groupId>
+            <artifactId>isc_sm_agent</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/isc_sm_agent-1.0.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.sgcc.uap</groupId>
+            <artifactId>isc_sso_agent</artifactId>
+            <version>1.0.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/isc_sso_agent-1.0.0.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20160810</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.10</version>
+        </dependency>
+        <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+            <artifactId>jackson-all</artifactId>
+            <version>1.9.2</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/jackson-all-1.9.2.jar</systemPath>
+        </dependency>
+    </dependencies>
+
+</project>

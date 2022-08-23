@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ylxx.cloud.upms.role.mapper.RoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="roleVo">
+        <id column="id" property="id" />
+        <result column="role_name" property="roleName" />
+        <result column="role_code" property="roleCode" />
+        <result column="sort_no" property="sortNo" />
+        <result column="status" property="status" />
+        <result column="remarks" property="remarks" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+	<!-- 通用查询映射结果扩展 -->
+    <resultMap id="BaseResultMapExt" extends="BaseResultMap" type="roleVo">
+    	<!-- 说明：关联其他表查询，多出来的字段映射写在此处，另外RoleVO也要加上对应的属性 -->
+    	
+    </resultMap>
+    
+
+	<select id="selectPageVo" resultMap="BaseResultMapExt" parameterType="roleDto">
+		select
+			T1.id,
+			T1.role_name,
+			T1.role_code,
+			T1.sort_no,
+			T1.status,
+			T1.remarks,
+			T1.create_by,
+			T1.create_time,
+			T1.update_by,
+			T1.update_time
+		from
+			t_base_role T1
+		<where>
+			<if test="param.id != null and param.id != ''">AND T1.id = #{param.id}</if>
+			<if test="param.roleCode != null and param.roleCode != ''">AND T1.role_code = #{param.roleCode}</if>
+			<if test="param.roleCodeQuery != null and param.roleCodeQuery != ''">AND T1.role_code like concat('%',#{param.roleCodeQuery},'%')</if>
+			<if test="param.roleName != null and param.roleName != ''">AND T1.role_name like concat('%',#{param.roleName},'%')</if>
+			<if test="param.sortNo != null and param.sortNo != ''">AND T1.sort_no = #{param.sortNo}</if>
+			<if test="param.status != null and param.status != ''">AND T1.status = #{param.status}</if>
+			<if test="param.remarks != null and param.remarks != ''">AND T1.remarks = #{param.remarks}</if>
+			<if test="param.createBy != null and param.createBy != ''">AND T1.create_by = #{param.createBy}</if>
+			<if test="param.createTime != null and param.createTime != ''">AND T1.create_time = #{param.createTime}</if>
+			<if test="param.updateBy != null and param.updateBy != ''">AND T1.update_by = #{param.updateBy}</if>
+			<if test="param.updateTime != null and param.updateTime != ''">AND T1.update_time = #{param.updateTime}</if>
+			<if test="param.username != null and param.username != ''">
+				and T1.id IN ( SELECT role_id FROM t_base_rel_user_role WHERE user_id in ( select id from t_base_user where username = #{param.username} ) )
+			</if>
+			<if test="param.roleCodes != null and param.roleCodes.size() > 0">
+				and T1.role_code IN
+				<foreach collection="param.roleCodes" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+			<if test="param.minSortNo != null"><![CDATA[ AND T1.sort_no >= #{param.minSortNo} ]]></if>
+		</where>
+	</select>
+
+	<insert id="insertBatch" parameterType="list">
+		insert into t_base_role
+		( 
+			id,
+			role_name,
+			role_code,
+			sort_no,
+			status,
+			remarks,
+			create_by,
+			create_time,
+			update_by,
+			update_time
+		) 
+		values 
+		<foreach collection="list" item="item" index="index" separator=",">
+            (
+				#{item.id},
+				#{item.roleName},
+				#{item.roleCode},
+				#{item.sortNo},
+				#{item.status},
+				#{item.remarks},
+				#{item.createBy},
+				#{item.createTime},
+				#{item.updateBy},
+				#{item.updateTime}
+			)
+        </foreach>
+	</insert>
+
+</mapper>

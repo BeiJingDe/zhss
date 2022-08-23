@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ylxx.cloud.system.log.mapper.SystemLogMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="systemLogVo">
+        <id column="ID" property="id" />
+        <result column="MENU_CODE" property="menuCode" />
+        <result column="log_module" property="logModule" />
+        <result column="LOG_CONTENT" property="logContent" />
+        <result column="OPERATE_TYPE" property="operateType" />
+        <result column="OPERATE_RESULT" property="operateResult" />
+        <result column="EXP_MESSAGE" property="expMessage" />
+        <result column="OPERATE_IP" property="operateIp" />
+        <result column="APP_NAME" property="appName" />
+        <result column="APP_IP" property="appIp" />
+        <result column="APP_PORT" property="appPort" />
+        <result column="REQ_URL" property="reqUrl" />
+        <result column="REQ_METHOD" property="reqMethod" />
+        <result column="REQ_PARAMS" property="reqParams" />
+        <result column="TIME_CONSUMING" property="timeConsuming" />
+		<result column="log_type" property="logType" />
+		<result column="log_level" property="logLevel" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="create_by" property="createBy" />
+		<result column="update_by" property="updateBy" />
+    </resultMap>
+    
+	<!-- 通用查询映射结果扩展 -->
+    <resultMap id="BaseResultMapExt" extends="BaseResultMap" type="systemLogVo">
+		<result column="menu_name" property="menuName" />
+		<result column="create_user" property="createUser" />
+    </resultMap>
+    
+
+	<select id="selectPageVo" resultMap="BaseResultMapExt" parameterType="systemLogDto">
+		select
+			T1.ID,
+			T1.MENU_CODE,
+			T1.log_module,
+			T1.LOG_CONTENT,
+			T1.OPERATE_TYPE,
+			T1.OPERATE_RESULT,
+			T1.EXP_MESSAGE,
+			T1.OPERATE_IP,
+			T1.APP_NAME,
+			T1.APP_IP,
+			T1.APP_PORT,
+			T1.REQ_URL,
+			T1.REQ_METHOD,
+			T1.REQ_PARAMS,
+			T1.TIME_CONSUMING,
+			T1.log_type,
+			T1.log_level,
+			T1.create_by,
+			T1.create_time,
+			T1.update_by,
+			T1.update_time,
+			t2.menu_name AS menu_name,
+			t3.realname AS create_user
+		from
+			t_system_log T1
+			LEFT JOIN t_base_menu t2
+				ON T1.menu_code = t2.id
+			LEFT JOIN t_base_user t3
+				ON T1.create_by = t3.username
+		<where>
+			t2.id is not null and t3.id is not null
+			<if test="param.id != null and param.id != ''">AND T1.id = #{param.id}</if>
+			<if test="param.menuCode != null and param.menuCode != ''">AND T1.menu_code = #{param.menuCode}</if>
+			<if test="param.logModule != null and param.logModule != ''">AND T1.log_module LIKE CONCAT('%', #{param.logModule}, '%')</if>
+			<if test="param.logContent != null and param.logContent != ''">AND T1.log_content LIKE CONCAT('%', #{param.logContent}, '%')</if>
+			<if test="param.operateType != null and param.operateType != ''">AND T1.operate_type = #{param.operateType}</if>
+			<if test="param.operateResult != null and param.operateResult != ''">AND T1.operate_result = #{param.operateResult}</if>
+			<if test="param.expMessage != null and param.expMessage != ''">AND T1.exp_message = #{param.expMessage}</if>
+			<if test="param.operateIp != null and param.operateIp != ''">AND T1.operate_ip = #{param.operateIp}</if>
+			<if test="param.appName != null and param.appName != ''">AND T1.app_name = #{param.appName}</if>
+			<if test="param.appIp != null and param.appIp != ''">AND T1.app_ip LIKE CONCAT('%', #{param.appIp}, '%')</if>
+			<if test="param.appPort != null and param.appPort != ''">AND T1.app_port = #{param.appPort}</if>
+			<if test="param.reqUrl != null and param.reqUrl != ''">AND T1.req_url = #{param.reqUrl}</if>
+			<if test="param.reqMethod != null and param.reqMethod != ''">AND T1.req_method = #{param.reqMethod}</if>
+			<if test="param.reqParams != null and param.reqParams != ''">AND T1.req_params = #{param.reqParams}</if>
+			<if test="param.timeConsuming != null and param.timeConsuming != ''">AND T1.time_consuming = #{param.timeConsuming}</if>
+			<if test="param.logType != null and param.logType != ''">AND T1.log_type = #{param.logType}</if>
+			<if test="param.logLevel != null and param.logLevel != ''">AND T1.log_level = #{param.logLevel}</if>
+			<if test="param.createBy != null and param.createBy != ''">AND T1.create_by = #{param.createBy}</if>
+			<if test="param.createTime != null">AND T1.create_time = #{param.createTime}</if>
+			<if test="param.updateBy != null and param.updateBy != ''">AND T1.update_by = #{param.updateBy}</if>
+			<if test="param.updateTime != null">AND T1.update_time = #{param.updateTime}</if>
+			<choose>
+				<when test="param.beginTime != null and param.endTime != null">
+					<![CDATA[ AND T1.create_time >= #{param.beginTime} AND T1.create_time <= #{param.endTime} ]]>
+				</when>
+				<when test="param.beginTime != null and param.endTime == null">
+					<![CDATA[ AND T1.create_time >= #{param.beginTime} ]]>
+				</when>
+				<when test="param.beginTime == null and param.endTime != null">
+					<![CDATA[ AND T1.create_time <= #{param.endTime} ]]>
+				</when>
+			</choose>
+			<if test="param.createUser != null and param.createUser != ''">AND t3.realname LIKE CONCAT('%', #{param.createUser}, '%')</if>
+			<if test="param.menuName != null and param.menuName != ''">AND t2.menu_name LIKE CONCAT('%', #{param.menuName}, '%')</if>
+		</where>
+	</select>
+
+	<select id="countSystemLogCapacity" resultType="double">
+		SELECT
+			(data_length + index_length)/1024/1024 AS total_size
+		FROM
+			information_schema.tables
+		WHERE
+			TABLE_SCHEMA = (SELECT DATABASE())
+			AND TABLE_NAME = 't_system_log'
+	</select>
+
+	<update id="backup">
+	<![CDATA[
+		INSERT IGNORE INTO t_system_log_backup SELECT * FROM t_system_log;
+	]]>
+	</update>
+
+	<update id="recovery">
+	<![CDATA[
+		INSERT IGNORE INTO t_system_log
+		SELECT * FROM t_system_log_backup
+		WHERE create_time <= DATE_ADD(NOW(), INTERVAL -6 MONTH)
+	]]>
+	</update>
+
+</mapper>

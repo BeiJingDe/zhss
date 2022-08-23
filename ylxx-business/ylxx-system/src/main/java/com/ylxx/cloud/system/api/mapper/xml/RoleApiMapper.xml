@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ylxx.cloud.system.api.mapper.RoleApiMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="roleApiVo">
+        <id column="id" property="id" />
+        <result column="role_code" property="roleCode" />
+        <result column="app_name" property="appName" />
+        <result column="req_url" property="reqUrl" />
+        <result column="req_method" property="reqMethod" />
+        <result column="is_active" property="isActive" />
+        <result column="remarks" property="remarks" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+	<!-- 通用查询映射结果扩展 -->
+    <resultMap id="BaseResultMapExt" extends="BaseResultMap" type="roleApiVo">
+    	<!-- 说明：关联其他表查询，多出来的字段映射写在此处，另外RoleApiVO也要加上对应的属性 -->
+    	
+    </resultMap>
+    
+
+	<select id="selectPageVo" resultMap="BaseResultMapExt" parameterType="roleApiDto">
+		select
+			T1.id,
+			T1.role_code,
+			T1.app_name,
+			T1.req_url,
+			T1.req_method,
+			T1.is_active,
+			T1.remarks,
+			T1.create_by,
+			T1.create_time,
+			T1.update_by,
+			T1.update_time
+		from
+			t_system_role_api T1
+		<where>
+		<if test="param.id != null and param.id != ''">AND T1.id = #{param.id}</if>
+		<if test="param.roleCode != null and param.roleCode != ''">AND T1.role_code = #{param.roleCode}</if>
+		<if test="param.appName != null and param.appName != ''">AND T1.app_name = #{param.appName}</if>
+		<if test="param.reqUrl != null and param.reqUrl != ''">AND T1.req_url = #{param.reqUrl}</if>
+		<if test="param.reqMethod != null and param.reqMethod != ''">AND T1.req_method = #{param.reqMethod}</if>
+		<if test="param.isActive != null and param.isActive != ''">AND T1.is_active = #{param.isActive}</if>
+		<if test="param.remarks != null and param.remarks != ''">AND T1.remarks = #{param.remarks}</if>
+		<if test="param.createBy != null and param.createBy != ''">AND T1.create_by = #{param.createBy}</if>
+		<if test="param.createTime != null">AND T1.create_time = #{param.createTime}</if>
+		<if test="param.updateBy != null and param.updateBy != ''">AND T1.update_by = #{param.updateBy}</if>
+		<if test="param.updateTime != null">AND T1.update_time = #{param.updateTime}</if>
+		</where>
+	</select>
+
+</mapper>

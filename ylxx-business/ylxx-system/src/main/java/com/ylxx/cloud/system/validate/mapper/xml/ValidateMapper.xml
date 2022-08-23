@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ylxx.cloud.system.validate.mapper.ValidateMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="validateVo">
+        <id column="id" property="id" />
+        <result column="validator_name" property="validatorName" />
+        <result column="type" property="type" />
+        <result column="regex" property="regex" />
+        <result column="message" property="message" />
+		<result column="create_time" property="createTime" />
+		<result column="update_time" property="updateTime" />
+		<result column="create_by" property="createBy" />
+		<result column="update_by" property="updateBy" />
+    </resultMap>
+    
+	<!-- 通用查询映射结果扩展 -->
+    <resultMap id="BaseResultMapExt" extends="BaseResultMap" type="validateVo">
+    	
+    </resultMap>
+    
+
+	<select id="selectPageVo" resultMap="BaseResultMapExt" parameterType="validateDto">
+		select
+			T1.id,
+			T1.validator_name,
+			T1.type,
+			T1.regex,
+			T1.message,
+			T1.create_by,
+			T1.create_time,
+			T1.update_by,
+			T1.update_time
+		from
+			t_system_validate T1
+		<where>
+			<if test="param.id != null and param.id != ''">AND T1.id = #{param.id}</if>
+			<if test="param.validatorName != null and param.validatorName != ''">AND T1.validator_name like concat('%', #{param.validatorName}, '%')</if>
+			<if test="param.type != null and param.type != ''">AND T1.type like concat('%', #{param.type}, '%')</if>
+			<if test="param.regex != null and param.regex != ''">AND T1.regex = #{param.regex}</if>
+			<if test="param.message != null and param.message != ''">AND T1.message = #{param.message}</if>
+			<if test="param.createBy != null and param.createBy != ''">AND T1.create_by = #{param.createBy}</if>
+			<if test="param.createTime != null">AND T1.create_time = #{param.createTime}</if>
+			<if test="param.updateBy != null and param.updateBy != ''">AND T1.update_by = #{param.updateBy}</if>
+			<if test="param.updateTime != null">AND T1.update_time = #{param.updateTime}</if>
+		</where>
+	</select>
+
+	<insert id="insertBatch" parameterType="list">
+		insert into t_system_validate
+		( 
+			id,
+			validator_name,
+			type,
+			regex,
+			message,
+			create_by,
+			create_time,
+			update_by,
+			update_time
+		) 
+		values 
+		<foreach collection="list" item="item" index="index" separator=",">
+            (
+				#{item.id},
+				#{item.validatorName},
+				#{item.type},
+				#{item.regex},
+				#{item.message},
+				#{item.createBy},
+				#{item.createTime},
+				#{item.updateBy},
+				#{item.updateTime}
+			)
+        </foreach>
+	</insert>
+
+</mapper>

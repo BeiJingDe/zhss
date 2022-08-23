@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ylxx.cloud.system.appversion.mapper.AppVersionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="appVersionVo">
+        <id column="id" property="id" />
+        <result column="app_version" property="appVersion" />
+        <result column="file_id" property="fileId" />
+        <result column="is_publish" property="isPublish" />
+        <result column="publish_time" property="publishTime" />
+        <result column="remarks" property="remarks" />
+		<result column="sort_no" property="sortNo" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+    
+	<!-- 通用查询映射结果扩展 -->
+    <resultMap id="BaseResultMapExt" extends="BaseResultMap" type="appVersionVo">
+    	<!-- 说明：关联其他表查询，多出来的字段映射写在此处，另外AppVersionVO也要加上对应的属性 -->
+		<result column="file_name" property="fileName" />
+		<result column="file_path" property="filePath" />
+    </resultMap>
+    
+
+	<select id="selectPageVo" resultMap="BaseResultMapExt" parameterType="appVersionDto">
+		select
+			T1.id,
+			T1.app_version,
+			T1.file_id,
+			T1.is_publish,
+			T1.publish_time,
+			T1.remarks,
+			T1.sort_no,
+			T1.create_by,
+			T1.create_time,
+			T1.update_by,
+			T1.update_time,
+			t2.file_name,
+			t2.file_path
+		from
+			t_system_app_version T1
+			left join t_base_file t2
+				on t1.file_id = t2.id
+		<where>
+			<if test="param.id != null and param.id != ''">AND T1.id = #{param.id}</if>
+			<if test="param.appVersion != null and param.appVersion != ''">AND T1.app_version = #{param.appVersion}</if>
+			<if test="param.fileId != null and param.fileId != ''">AND T1.file_id = #{param.fileId}</if>
+			<if test="param.isPublish != null and param.isPublish != ''">AND T1.is_publish = #{param.isPublish}</if>
+			<if test="param.publishTime != null and param.publishTime != ''">AND T1.publish_time = #{param.publishTime}</if>
+			<if test="param.remarks != null and param.remarks != ''">AND T1.remarks = #{param.remarks}</if>
+			<if test="param.sortNo != null">AND T1.sort_no = #{param.sortNo}</if>
+			<if test="param.createBy != null and param.createBy != ''">AND T1.create_by = #{param.createBy}</if>
+			<if test="param.createTime != null and param.createTime != ''">AND T1.create_time = #{param.createTime}</if>
+			<if test="param.updateBy != null and param.updateBy != ''">AND T1.update_by = #{param.updateBy}</if>
+			<if test="param.updateTime != null and param.updateTime != ''">AND T1.update_time = #{param.updateTime}</if>
+			<if test="param.ids != null and param.ids.size() > 0">
+				AND T1.id in
+				<foreach collection="param.ids" item="item" index="index" open="(" separator="," close=")">
+					#{item}
+				</foreach>
+			</if>
+		</where>
+	</select>
+
+	<insert id="insertBatch" parameterType="list">
+		insert into t_system_app_version
+		( 
+			id,
+			app_version,
+			file_id,
+			is_publish,
+			publish_time,
+			remarks,
+			sort_no,
+			create_by,
+			create_time,
+			update_by,
+			update_time
+		) 
+		values 
+		<foreach collection="list" item="item" index="index" separator=",">
+            (
+				#{item.id},
+				#{item.appVersion},
+				#{item.fileId},
+				#{item.isPublish},
+				#{item.publishTime},
+				#{item.remarks},
+				#{item.sortNo},
+				#{item.createBy},
+				#{item.createTime},
+				#{item.updateBy},
+				#{item.updateTime}
+			)
+        </foreach>
+	</insert>
+
+</mapper>

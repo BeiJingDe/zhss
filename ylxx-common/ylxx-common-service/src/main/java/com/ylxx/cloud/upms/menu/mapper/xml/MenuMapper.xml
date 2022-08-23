@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ylxx.cloud.upms.menu.mapper.MenuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="menuVo">
+        <id column="id" property="id"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="menu_type" property="menuType"/>
+        <result column="menu_name" property="menuName"/>
+        <result column="menu_code" property="menuCode"/>
+        <result column="component_name" property="componentName"/>
+        <result column="component_path" property="componentPath"/>
+        <result column="request_url" property="requestUrl"/>
+        <result column="redirect_url" property="redirectUrl"/>
+        <result column="menu_icon" property="menuIcon"/>
+        <result column="sort_no" property="sortNo"/>
+        <result column="is_always_show" property="isAlwaysShow"/>
+        <result column="is_route" property="isRoute"/>
+        <result column="is_leaf" property="isLeaf"/>
+        <result column="is_keep_alive" property="isKeepAlive"/>
+        <result column="is_hidden" property="isHidden"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询映射结果扩展 -->
+    <resultMap id="BaseResultMapExt" extends="BaseResultMap" type="menuVo">
+        <!-- 说明：关联其他表查询，多出来的字段映射写在此处，另外MenuVO也要加上对应的属性 -->
+
+    </resultMap>
+
+
+    <select id="selectPageVo" resultMap="BaseResultMapExt" parameterType="menuDto">
+        select
+        T1.id,
+        T1.parent_id,
+        T1.menu_type,
+        T1.menu_name,
+        T1.menu_code,
+        T1.component_name,
+        T1.component_path,
+        T1.request_url,
+        T1.redirect_url,
+        T1.menu_icon,
+        T1.sort_no,
+        T1.is_always_show,
+        T1.is_route,
+        T1.is_leaf,
+        T1.is_keep_alive,
+        T1.is_hidden,
+        T1.create_by,
+        T1.create_time,
+        T1.update_by,
+        T1.update_time
+        from
+        t_base_menu T1
+        <where>
+            <if test="param.id != null and param.id != ''">AND T1.id = #{param.id}</if>
+            <if test="param.parentId != null and param.parentId != ''">AND T1.parent_id = #{param.parentId}</if>
+            <if test="param.menuType != null and param.menuType != ''">AND T1.menu_type = #{param.menuType}</if>
+            <if test="param.menuName != null and param.menuName != ''">AND T1.menu_name = #{param.menuName}</if>
+            <if test="param.menuCode != null and param.menuCode != ''">AND T1.menu_code = #{param.menuCode}</if>
+            <if test="param.componentName != null and param.componentName != ''">AND T1.component_name =
+                #{param.componentName}
+            </if>
+            <if test="param.componentPath != null and param.componentPath != ''">AND T1.component_path =
+                #{param.componentPath}
+            </if>
+            <if test="param.requestUrl != null and param.requestUrl != ''">AND T1.request_url = #{param.requestUrl}</if>
+            <if test="param.redirectUrl != null and param.redirectUrl != ''">AND T1.redirect_url =
+                #{param.redirectUrl}
+            </if>
+            <if test="param.menuIcon != null and param.menuIcon != ''">AND T1.menu_icon = #{param.menuIcon}</if>
+            <if test="param.sortNo != null and param.sortNo != ''">AND T1.sort_no = #{param.sortNo}</if>
+            <if test="param.isAlwaysShow != null and param.isAlwaysShow != ''">AND T1.is_always_show =
+                #{param.isAlwaysShow}
+            </if>
+            <if test="param.isRoute != null and param.isRoute != ''">AND T1.is_route = #{param.isRoute}</if>
+            <if test="param.isLeaf != null and param.isLeaf != ''">AND T1.is_leaf = #{param.isLeaf}</if>
+            <if test="param.isKeepAlive != null and param.isKeepAlive != ''">AND T1.is_keep_alive =
+                #{param.isKeepAlive}
+            </if>
+            <if test="param.isHidden != null and param.isHidden != ''">AND T1.is_hidden = #{param.isHidden}</if>
+            <if test="param.createBy != null and param.createBy != ''">AND T1.create_by = #{param.createBy}</if>
+            <if test="param.createTime != null and param.createTime != ''">AND T1.create_time = #{param.createTime}</if>
+            <if test="param.updateBy != null and param.updateBy != ''">AND T1.update_by = #{param.updateBy}</if>
+            <if test="param.updateTime != null and param.updateTime != ''">AND T1.update_time = #{param.updateTime}</if>
+            <if test="param.username != null and param.username != ''">
+                AND T1.id in (
+                select menu_id from t_base_rel_role_menu where role_id in (
+                select role_id from t_base_rel_user_role where user_id in (
+                select id from t_base_user where username = #{param.username}
+                )))
+            </if>
+            <if test="param.roleCodes != null and param.roleCodes.size() > 0">
+                and t1.id IN (
+                SELECT menu_id FROM t_base_rel_role_menu WHERE role_id IN (
+                select id from t_base_role where role_code in
+                <foreach collection="param.roleCodes" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+                )
+                )
+            </if>
+            <if test="param.menuCodes != null and param.menuCodes.size() > 0">
+                and t1.menu_code IN
+                <foreach collection="param.menuCodes" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <insert id="insertBatch" parameterType="list">
+        insert into t_base_menu
+        (
+        id,
+        parent_id,
+        menu_type,
+        menu_name,
+        menu_code,
+        component_name,
+        component_path,
+        request_url,
+        redirect_url,
+        menu_icon,
+        sort_no,
+        is_always_show,
+        is_route,
+        is_leaf,
+        is_keep_alive,
+        is_hidden,
+        create_by,
+        create_time,
+        update_by,
+        update_time
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (
+            #{item.id},
+            #{item.parentId},
+            #{item.menuType},
+            #{item.menuName},
+            #{item.menuCode},
+            #{item.componentName},
+            #{item.componentPath},
+            #{item.requestUrl},
+            #{item.redirectUrl},
+            #{item.menuIcon},
+            #{item.sortNo},
+            #{item.isAlwaysShow},
+            #{item.isRoute},
+            #{item.isLeaf},
+            #{item.isKeepAlive},
+            #{item.isHidden},
+            #{item.createBy},
+            #{item.createTime},
+            #{item.updateBy},
+            #{item.updateTime}
+            )
+        </foreach>
+    </insert>
+
+    <select id="selectMenuTmp" resultType="com.ylxx.cloud.upms.menu.model.MenuVOTmp">
+		SELECT
+			id,
+			parent_id,
+			menu_type,
+			menu_name title,
+			menu_code name,
+			is_leaf,
+			menu_icon icon,
+			component_name component,
+			component_path path,
+			is_hidden hidden
+		FROM
+			`t_base_menu`
+		WHERE
+			id IN (
+				select menu_id from t_base_rel_role_menu where role_id in (
+					select role_id from t_base_rel_user_role where user_id in (
+						select id from t_base_user where username = #{username}
+					)
+			 	)
+			 )
+		ORDER BY
+			sort_no
+	</select>
+
+	<select id="selectButtonTmp" resultType="String">
+		SELECT
+		id
+		FROM
+		`t_base_menu`
+		WHERE
+		id IN (
+		select menu_id from t_base_rel_role_menu where role_id in (
+		select role_id from t_base_rel_user_role where user_id in (
+		select id from t_base_user where username = #{username}
+		)
+		)
+		)
+		and menu_type = '02'
+		ORDER BY
+		sort_no
+	</select>
+
+
+	<select id="selectMenuTmpByBusiCode" resultType="com.ylxx.cloud.upms.menu.model.MenuVOTmp">
+		SELECT
+		id,
+		parent_id,
+		menu_type,
+		menu_name title,
+		menu_code name,
+		is_leaf,
+		menu_icon icon,
+		component_name component,
+		component_path path,
+		is_hidden hidden
+		FROM
+		`t_base_menu`
+		where id in
+		<foreach collection="ids" index="index" item="item"  open="(" separator="," close=")">
+			#{item}
+		</foreach>
+        ORDER BY
+        sort_no
+	</select>
+
+	<select id="selectButtonTmpByBusiCode" resultType="String">
+		SELECT
+		id
+		FROM
+		`t_base_menu`
+		where id in
+		<foreach collection="ids" index="index" item="item"  open="(" separator="," close=")">
+			#{item}
+		</foreach>
+        ORDER BY
+        sort_no
+	</select>
+</mapper>

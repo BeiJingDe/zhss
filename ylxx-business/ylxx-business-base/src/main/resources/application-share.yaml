@@ -1,0 +1,16 @@
+
+my:
+  netty:
+    serverPort: 28764
+  rabbitmq:
+    queueMonitorData: ct_cured_tobacco_monitor_data
+    queueResponseData: ct_cured_tobacco_response_data
+    queueConnectData: ct_cured_tobacco_connect_data
+  cron:
+    # 定时任务：采集气象数据
+    refreshWeatherInfo: 0 0 * * * ?
+    # 定时任务：同步外网数据到内网数据库
+    asyncBatchDataTime: 0 0 18 * * ?
+    # 定时任务：获取内网数据到外网数据库
+    asyncBatchKwhReading: 0 0 23 * * ?
+

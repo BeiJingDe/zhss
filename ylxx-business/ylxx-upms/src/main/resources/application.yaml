@@ -1,0 +1,75 @@
+server:
+  port: 28282
+  tomcat:
+    uri-encoding: UTF-8
+spring:
+  application:
+    name: ylxx-upms
+  profiles:
+    active: local,share
+  http:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+  datasource:
+    name: druidDataSource
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    druid:
+      filters: config
+      max-active: 100
+      initial-size: 1
+      max-wait: 60000
+      min-idle: 1
+      time-between-eviction-runs-millis: 60000
+      min-evictable-idle-time-millis: 300000
+      validation-query: select 'x'
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-open-prepared-statements: 50
+      max-pool-prepared-statement-per-connection-size: 20
+      remove-abandoned: true
+      remove-abandoned-timeout: 180
+      log-abandoned: true
+  redis:
+    timeout: 5000
+    jedis:
+      pool:
+        max-idle: 200
+        max-wait: -1
+        min-idle: 0
+  jackson:
+    serialization:
+      write-dates-as-timestamps: true
+  servlet.multipart:
+    max-file-size: 100MB
+    max-request-size: 100MB
+  mvc:
+    hiddenmethod:
+      filter:
+        enabled: true
+    static-path-pattern: /**
+  resources:
+    static-locations: classpath:/META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath*:com/ylxx/**/mapper/xml/*.xml
+  type-aliases-package: com.ylxx.**.model
+logging: 
+  level: 
+    io.swagger.models.parameters.AbstractSerializableParameter: error
+management: 
+  endpoints: 
+    web: 
+      exposure: 
+        include: "*"
+  endpoint:
+    health: 
+      show-details: always
+
+
+
